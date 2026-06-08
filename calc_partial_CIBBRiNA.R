@@ -2,24 +2,24 @@
 #' Calculates total bycatch for bycatch models fitted in BEAM
 #' 
 #' @description
-#' `calc_total` calculates total bycatch based on a BPUE.
+#' `calc_partial` calculates partial bycatch for cases in which total bycatch could not be calculated due to unmonitored levels of variables affecing BPUE.
 #' 
 #' #' @details
 #' If there are multiple rows in needle, each row is processed separately, and
 #' combined into one data.table with nrow equal to the number of rows in needle.
 #' 
-#' @param bpue data.table output from the BPUE estimation function (calc_bpue.r), with values for for `analysis_resolution`, used to subset observations from `dat`. 
+#' @param tot data.table output from the total bycatch estimation function (calc_total.r), with values for for `analysis_resolution`, used to subset observations from `dat`. 
 #' @param response Character string. Name of the response variable. Typically, a column containing the number of individuals or bycatch incidents (positive integer values).
 #' @param effort_term Character string. Name of the variable to be used as an offset (e.g. number of days at sea, number of hooks, number of nets …), in both `dat` and `fishing`. By default, the log of this covariate will be used as offset in the model. 
 #' @param analysis_resolution vector of column names, whose unique combinations are used to split the data given in `dat` and `fishing`. Must be the same vector used in calc_bpue.r. Note that if `species` is among those columns, it is not used when subsetting `fishing` (because the fishing effort dataset does not include information about species).
-#' @param dat data.table with observed (monitored) fishing effort data. Same `dat` input table used in calc_bpue.r 
+#' @param dat data.table with observed (monitored) fishing effort data. Same `dat` input table used in calc_bpue.r and calc_total.r
 #' @param fishing data.table with all fishing effort data.
 #' @param verbose Logical, passed on to predict_response. Set to FALSE if nrow(bpue) > 1.
 #' @param filter optional named list for subsetting `fishing` and the observed bycatch summation (but NOT model fitting. BPUE is estimated based on all data available, weighted is applicable). Each element name must be a column in both `fishing` and `dat`, and each element value is a vector of levels to retain. E.g. `list(year = 2023, ecoregion = "North Sea")`. Default NULL
 #' @param include.weights boolean indicator indicating whether observations from the five most recent years should have double weight as compared to older data. 
 #' @param weight_values Optional. Numeric vector of observation weights. Must be of the same length that dat. Only used if include.weights = TRUE. Default is NULL.
-#' @returns A data.table with all columns given in `analysis_resolution`, and additional columns showing the model formula, total bycatch estimate, lower and upper confidence intervals, and total fishing effort. See details.
-#' @seealso [calc_bpue()]
+#' @returns A data.table containing only rows for which a partial estimate is required, with all columns given in `analysis_resolution`, and additional columns showing the model formula, partial bycatch estimate, lower and upper confidence intervals, and fishing effort. See details.
+#' @seealso [calc_bpue(), calc_total()]
 #' @export
 
 calc_partial <- function(tot, analysis_resolution, dat, fishing, verbose = TRUE, include.weights=FALSE,response, effort_term,weights_values, filter=NULL) {
@@ -67,7 +67,7 @@ calc_partial <- function(tot, analysis_resolution, dat, fishing, verbose = TRUE,
   
   #Focus only on cases which were not calculated due to missing levels in monitoring
   
-  tot <- tot[message == "More levels available in fishing effort than in monitoring data for at least one random effect - Cannot estimate total bycatch for the levels in which BPUE is unknown"],
+  tot <- tot[message == "More levels available in fishing effort than in monitoring data for at least one random effect - Cannot estimate total bycatch for the levels in which BPUE is unknown"]
   
   #Create standardised column to use in data manipulation and modelling step further below. Avoids having to use get() of dat[[]] throughout the entire code.
   dat[, resp   := get(response)]
