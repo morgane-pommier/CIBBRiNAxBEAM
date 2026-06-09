@@ -1,12 +1,10 @@
-
-#' Calculates total bycatch for bycatch models fitted in BEAM
+## ---------------------------
+## Authors :  WGBYC ToR C members. Original scripts available at https://github.com/dlusseau/BEAM/tree/main (calc_partial() does not exist in the original BEAM library, but is an extension / adaptation from the base calc_total() function)
+## Adapted from calc_total() for CIBBRiNA users by MP.
+## ---------------------------
 #' 
 #' @description
-#' `calc_partial` calculates partial bycatch for cases in which total bycatch could not be calculated due to unmonitored levels of variables affecing BPUE.
-#' 
-#' #' @details
-#' If there are multiple rows in needle, each row is processed separately, and
-#' combined into one data.table with nrow equal to the number of rows in needle.
+#' `calc_partial` Runs on the ouput from `calc_total()`. Calculates partial bycatch for cases in which total bycatch could not be calculated due to unmonitored levels of variables affecing BPUE.
 #' 
 #' @param tot data.table output from the total bycatch estimation function (calc_total.r), with values for for `analysis_resolution`, used to subset observations from `dat`. 
 #' @param response Character string. Name of the response variable. Typically, a column containing the number of individuals or bycatch incidents (positive integer values).
