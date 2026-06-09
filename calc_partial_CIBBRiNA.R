@@ -25,7 +25,7 @@ calc_partial <- function(tot, analysis_resolution, dat, fishing, verbose = TRUE,
   # parallelization support
   if (nrow(tot) > 1) {
     ret <- foreach(i = 1:nrow(tot), 
-                   .export = "calc_total", # <- not 100% sure this line is needed.
+                   .export = "calc_partial", # <- not 100% sure this line is needed.
                    .final = rbindlist,
                    .packages = c("data.table", "glmmTMB", "emmeans", "ggeffects")) %dopar% {
                      calc_total(tot = tot[i], analysis_resolution = analysis_resolution, dat = dat, fishing = fishing, verbose = FALSE, include.weights=FALSE,response, effort_term = effort_term,weights_values, filter)
