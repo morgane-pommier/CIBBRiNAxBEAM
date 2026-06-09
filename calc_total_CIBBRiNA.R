@@ -1,12 +1,10 @@
+## ---------------------------
+## Authors :  WGBYC ToR C members. Original scripts available at https://github.com/dlusseau/BEAM/tree/main
+## Adapted for CIBBRiNA users by MP.
+## ---------------------------
 
-#' Calculates total bycatch for bycatch models fitted in BEAM
-#' 
 #' @description
-#' `calc_total` calculates total bycatch based on a BPUE.
-#' 
-#' #' @details
-#' If there are multiple rows in needle, each row is processed separately, and
-#' combined into one data.table with nrow equal to the number of rows in needle.
+#' `calc_total` Calculates total bycatch, where possible, based on the outcome of `calc_bpue()` and total fishing effort.
 #' 
 #' @param bpue data.table output from the BPUE estimation function (calc_bpue.r), with values for for `analysis_resolution`, used to subset observations from `dat`. 
 #' @param response Character string. Name of the response variable. Typically, a column containing the number of individuals or bycatch incidents (positive integer values).
@@ -19,7 +17,7 @@
 #' @param include.weights boolean indicator indicating whether observations from the five most recent years should have double weight as compared to older data. 
 #' @param weight_values Optional. Numeric vector of observation weights. Must be of the same length that dat. Only used if include.weights = TRUE. Default is NULL.
 #' @returns A data.table with all columns given in `analysis_resolution`, and additional columns showing the model formula, total bycatch estimate, lower and upper confidence intervals, and total fishing effort. See details.
-#' @seealso [calc_bpue()]
+#' @seealso [calc_bpue(), calc_partial()]
 #' @export
 
 calc_total <- function(bpue, analysis_resolution, dat, fishing, verbose = TRUE, include.weights=FALSE,response, effort_term,weights_values, filter=NULL) {
