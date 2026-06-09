@@ -1,15 +1,15 @@
-
-#' Assess zero bycatch probability when no incident/individual was observed, given the monitoring effort.
+## ---------------------------
+## Authors :  WGBYC ToR C members. Original scripts available at https://github.com/dlusseau/BEAM/tree/main
+## Adapted for CIBBRiNA users by MP.
+## ---------------------------
+#
+#'@description Assess zero bycatch probability when no incident/individual was observed, given the monitoring effort.
 #'
 #' @param bpue A data.table output from the BPUE estimation function (calc_bpue.r), containing at minimum columns: model, observed_effort, and the columns named in analysis_resolution. 
-#' 
 #' @param bycatch_rarity Numeric. Expected “true” probability of a bycatch incident for any given fishing operation. Default 0.001 (i.e. very rare, in 1000 fishing operations), as defined by WKPETSAMP (ICES, 2024) and agreed to in WKBEAM (ICES, 2026).   
-
 #' @param analysis_resolution Character vector of column names defining the unit of analysis and the final aggregation level at which the assessment is produced. Must be the same as the resolution used to estimate BPUE (See calc_bpue.r).  
-#'
 #' @return A data.table identical in structure to \code{bpue}, with bpue, lwr, and upr
 #'   filled in for cases where zero bycatch is statistically supported (p <= 0.01).
-#'
 #' @details A zero bpue is accepted for a given group when the probability of observing
 #'   zero bycatch under \code{bycatch_rarity} given the observed effort is below 0.01,
 #'   i.e. it is very unlikely that bycatch would have gone undetected. The upper confidence
@@ -19,7 +19,6 @@
 zeros_prob_vect <-function(n_ind=1L,effort,rarity=0.001,bootstrap=1000L) {
   mean(rbinom(bootstrap, size = effort * n_ind, prob = rarity) == 0L) #speed up the initial approach 
 }
-
 
 zero_assessments<-function(bpue,bycatch_rarity = 0.001, analysis_resolution ### Default thresholds decided at ICES WKBBEAM Dec 2025, based on WKPETSAMP report (ICES, 2024)
                            ) {
