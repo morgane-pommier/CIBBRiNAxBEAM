@@ -1,6 +1,8 @@
+## ---------------------------
+## Authors :  WGBYC ToR C members. Original scripts available at https://github.com/dlusseau/BEAM/tree/main
+## Adapted for CIBBRiNA users by MP.
+## ---------------------------
 
-#' Calculates BPUE (bycatch per unit effort) based on user's input dataset
-#' 
 #' @description
 #' `calc_bpue` uses monitored fishing effort data to generate a number of models of varying
 #' complexity to estimate bycatch rate. It then compares those models using the Akaike Information Criterion (AIC), combined with a stability 
