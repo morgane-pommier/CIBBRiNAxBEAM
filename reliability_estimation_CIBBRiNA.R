@@ -47,7 +47,7 @@ reliability_estimation <- function(tot,
       total = nrow(tot),
       width = 60)
     
-    opts <- list(progress = BEAM_progress)
+    opts <- list(progress = BEAM_pb)
     
     ret <- foreach(i = 1:nrow(tot),
                    .export = "calc_rmse",
