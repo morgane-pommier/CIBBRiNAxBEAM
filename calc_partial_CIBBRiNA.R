@@ -20,7 +20,7 @@
 #' @seealso [calc_bpue(), calc_total()]
 #' @export
 
-calc_partial <- function(tot, analysis_resolution, dat, fishing, verbose = TRUE, include.weights=FALSE,response, effort_term,weights_values, filter=NULL) {
+calc_partial <- function(tot, analysis_resolution, dat, fishing, verbose = TRUE, include.weights=FALSE,response, effort_term,weights_values=NULL, filter=NULL) {
   
   # parallelization support
   if (nrow(tot) > 1) {
@@ -28,12 +28,12 @@ calc_partial <- function(tot, analysis_resolution, dat, fishing, verbose = TRUE,
                    .export = "calc_partial", # <- not 100% sure this line is needed.
                    .final = rbindlist,
                    .packages = c("data.table", "glmmTMB", "emmeans", "ggeffects")) %dopar% {
-                     calc_total(tot = tot[i], analysis_resolution = analysis_resolution, dat = dat, fishing = fishing, verbose = FALSE, include.weights=FALSE,response, effort_term = effort_term,weights_values, filter)
+                     calc_partial(tot = tot[i], analysis_resolution = analysis_resolution, dat = dat, fishing = fishing, verbose = FALSE, include.weights=FALSE,response, effort_term = effort_term,weights_values, filter)
                    }
     return(ret)
   }
   
-  #Apply any filter to fishing if needed. Checks that the filtering columns are present in both fishing effoert and monitoring data, so the observed bycatch can be filtered accordingly before summation at the end
+  #Apply any filter to fishing if needed. Checks that the filtering columns are present in both fishing effort and monitoring data, so the observed bycatch can be filtered accordingly before summation at the end
   
   filter_fishing <- NULL
   filter_dat     <- NULL
@@ -113,7 +113,7 @@ calc_partial <- function(tot, analysis_resolution, dat, fishing, verbose = TRUE,
   #Create the partial object
   tot_partial <- fishing_filtered[, .(effort = sum(effort)), by = re]
   tot_partial <- tot_partial[complete.cases(tot_partial)]
-
+  
   # Refit best model
   if(isTRUE(include.weights)){
     best <- glmmTMB(formula = form, offset = logEffort, family = nbinom2, data = dat, weights = weights)
@@ -128,44 +128,49 @@ calc_partial <- function(tot, analysis_resolution, dat, fishing, verbose = TRUE,
     }
   }
   
+  
+  # sum monitoring effort, and number of bycaught animals, per random factor 
+  tot_obs <- dat_filtered[,(re) := lapply(.SD, as.factor), .SDcols = re]
+  tot_obs <- tot_obs[,
+                     .(observed_effort = sum(effort), 
+                       observed_bycatch = sum(resp)), 
+                     by = re]
+  
+  tot_partial[, (re) := lapply(.SD, as.factor), .SDcols = re] # Do we treat YEAR correctly here? or does year need to be exempted?
+  
+  # join total fishing effort and monitored effort 
+  tot_partial <- tot_obs[tot_partial, on=re]
+  tot_partial[is.na(observed_effort), observed_effort := 0] # replace na with 0
+  tot_partial[is.na(observed_bycatch), observed_bycatch := 0] # replace na with 0
+  tot_partial[,unmonitored_fishing_effort := effort - observed_effort] #
+  tot_partial[, logEffort := log(unmonitored_fishing_effort)]
+  
+  
+  pred <- rbindlist(lapply(1:nrow(tot), function(i) {
+    type_arg <- ifelse(packageVersion("ggeffects") >= "2.0.0", "random", "re")
     
-    # sum monitoring effort, and number of bycaught animals, per random factor 
-    tot_obs <- dat_filtered[,(re) := lapply(.SD, as.factor), .SDcols = re]
-    tot_obs <- tot_obs[,
-                       .(observed_effort = sum(effort), 
-                         observed_bycatch = sum(resp)), 
-                       by = re]
+    p <- ggpredict(model = best,
+                   terms = tot_partial[i, ..re],
+                   condition = c(logEffort = tot_partial$logEffort[i]),
+                   type = type_arg,
+                   interval = "confidence",
+                   verbose = verbose)
     
-    tot_partial[, (re) := lapply(.SD, as.factor), .SDcols = re] # Do we treat YEAR correctly here? or does year need to be exempted?
-    
-    # join total fishing effort and monitored effort 
-    tot_partial <- tot_obs[tot_partial, on=re]
-    tot_partial[is.na(observed_effort), observed_effort := 0] # replace na with 0
-    tot_partial[is.na(observed_bycatch), observed_bycatch := 0] # replace na with 0
-    tot_partial[,unmonitored_fishing_effort := effort - observed_effort] #
-    tot_partial[, logEffort := log(unmonitored_fishing_effort)]
-    
-    
-    pred <- lapply(1:nrow(tot), function(i) {
-      type_arg <- ifelse(packageVersion("ggeffects") >= "2.0.0", "random", "re")
-      
-      p <- ggpredict(model = best,
-                     terms = tot_partial[i, ..re],
-                     condition = c(logEffort = tot_partial$logEffort[i]),
-                     type = type_arg,
-                     interval = "confidence",
-                     verbose = verbose)
-      
-      p <- as.data.frame(p) 
-      data.table(mean = p$predicted,
-                 lwr = ifelse(!is.null(p[["conf.low"]]), p[["conf.low"]], NA_real_),
-                 upr = ifelse(!is.null(p[["conf.high"]]), p[["conf.high"]], NA_real_))
-    }) |> rbindlist()
-    
-    ret[, c("tot_mean", "tot_lwr", "tot_upr") := as.list(colSums(pred) + sum(tot_partial$observed_bycatch))] # prediction for unmonitored fishing effort + observed bycatch in monitoring
-    ret$fishing_effort <- sum(tot_partial$effort) # retain total fishing effort or total unmonitored fishing effort?
-    
+    p <- as.data.frame(p) 
+    data.table(mean = p$predicted,
+               lwr = ifelse(!is.null(p[["conf.low"]]), p[["conf.low"]], NA_real_),
+               upr = ifelse(!is.null(p[["conf.high"]]), p[["conf.high"]], NA_real_))
+  }))
+  
+  ret[, c("tot_mean", "tot_lwr", "tot_upr") := as.list(colSums(pred) + sum(tot_partial$observed_bycatch))] # prediction for unmonitored fishing effort + observed bycatch in monitoring
+  ret$fishing_effort <- sum(tot_partial$effort) # retain total fishing effort or total unmonitored fishing effort?
   
   return(ret)
+  
 }
+
+
+
+
+
 
