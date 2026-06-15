@@ -43,18 +43,18 @@ reliability_estimation <- function(tot,
       rm("BEAM_pb", envir = .GlobalEnv)
     }
     BEAM_pb <<- progress_bar$new(
-      format = "calc_rmse :percent :current/:total [:bar] :elapsed | eta: :eta",
+      format = "reliability_estimation :percent :current/:total [:bar] :elapsed | eta: :eta",
       total = nrow(tot),
       width = 60)
     
     opts <- list(progress = BEAM_pb)
     
     ret <- foreach(i = 1:nrow(tot),
-                   .export = "calc_rmse",
+                   .export = "reliability_estimation",
                    .final = rbindlist,
                    .packages = c("data.table", "glmmTMB", "ggeffects", "emmeans"),
                    .options.snow = opts) %dopar% {
-                     calc_rmse(
+                     reliability_estimation(
                        tot = tot[i],
                        dat = dat,
                        analysis_resolution = analysis_resolution,
@@ -72,8 +72,11 @@ reliability_estimation <- function(tot,
   #Create new columns for RMSE calculations:
   
   ret <- copy(tot)
-  ret[, c("RMSE", "factor", "lower_factor_prop", "upper_factor_prop", "reliability_rmse", "CI_breadth_pass",  "Overall_reliability") :=
-        list(NA_real_, NA_real_, NA_real_, NA_real_, NA, NA, NA)]
+  ret[, c("RMSE", "factor", "lower_factor_prop", "upper_factor_prop",
+          "reliability_rmse", "CI_breadth_pass", "Overall_reliability",
+          "tot_lwr_log", "tot_upr_log", "CI_breadth") :=
+        list(NA_real_, NA_real_, NA_real_, NA_real_, NA, NA, NA,
+             NA_real_, NA_real_, NA_real_)]
   
   #Skip cases that do not have a total bycatch estimate or no usable model. Partial estimates will by default have a unreliable estimate. Do we want to change that and still compute RMSE on partial models ?
   
@@ -148,20 +151,22 @@ reliability_estimation <- function(tot,
     # Transform back from log scale
     factor_val <- exp(rmse_val)
     # The lower limit of the 68% interval is: 100(1-1/factor) # in percentage
-    lower_factor_prop <- 100 * (1 - 1 / factor_val)
+    lower_factor_prop_val <- 100 * (1 - 1 / factor_val)
     # The upper limit of the 68% interval is: 100(factor−1) # in percentage
-    upper_factor_prop <- 100 * (factor_val - 1)
+    upper_factor_prop_val <- 100 * (factor_val - 1)
     # RELIABILITY LIMIT ON BOTH CONFIDENCE INTERVALS OF FACTOR
     # Take the 25% limit of the lower % CI of factor (=80% similarity)
     # Take the 25% limit of the upper % CIs of factor (=80% similarity)
     # Which are below 25%
     
-    ret$tot_lwr_log <- log10(ret$tot_lwr+1)
-    ret$tot_upr_log<-log10(ret$tot_upr+1)
-    ret$CI_breadth<-ret$tot_upr_log-ret$tot_lwr_log
+    ret[, `:=`(
+      tot_lwr_log = log10(tot_lwr + 1),
+      tot_upr_log = log10(tot_upr + 1),
+      CI_breadth  = log10(tot_upr + 1) - log10(tot_lwr + 1)
+    )]
     
     ret[, c("RMSE", "factor", "lower_factor_prop", "upper_factor_prop") :=
-          list(rmse_val, factor_val, lower_factor_prop, upper_factor_prop)]
+          list(rmse_val, factor_val, lower_factor_prop_val, upper_factor_prop_val)]
     
     #Make all the TRUE/FALSE checks
     ret[, reliability_rmse        := lower_factor_prop <= 25 & upper_factor_prop <= 25]
