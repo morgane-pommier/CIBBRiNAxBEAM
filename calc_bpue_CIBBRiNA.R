@@ -51,7 +51,7 @@ calc_bpue <- function(needle, analysis_resolution = colnames(needle), min_re_obs
             rm("BEAM_pb", envir = .GlobalEnv)
 			 }
         
-        BEAM_pb <<- progress_bar$new(
+        BEAM_pb <<- progress::progress_bar$new(
             format = "calc_bpue :percent :current/:total [:bar] :elapsed | eta: :eta",
             total = nrow(needle),
             width = 60)
