@@ -1,6 +1,6 @@
 # BEAM-CIBBRiNA
 
-This repository compiles functions from the CIBBRiNAxBEAM bycatch estimation toolbox. The core functions of ICES WGBYC BEAM (https://github.com/dlusseau/BEAM), used to estimate bycatch per unit of effort (BPUE) and total bycatch, were further developed to facilitate their application to a wider and more diverse set of bycatch data, such as those collected in CIBBRiNA case studies. 
+This repository compiles functions from the CIBBRiNAxBEAM bycatch estimation toolbox. The tools are implemented in the R programming language. The core functions of ICES WGBYC BEAM, used to estimate bycatch per unit of effort (BPUE) and total bycatch, are adapted to facilitate their application to a wider and more diverse set of bycatch data, such as those collected in CIBBRiNA case studies .
 
 - calc_bpue.r: Assesses whether heterogeneity in BPUE occurs within the fleet, selects the best modelling option in consequence, and estimates population-level BPUEs.
 - zero_assessment.r: For cases where no bycatch was reported, assesses whether a BPUE of 0 can be statistically supported, given the monitoring effort available.
@@ -9,6 +9,11 @@ This repository compiles functions from the CIBBRiNAxBEAM bycatch estimation too
 - reliability_estimation.r: Assesses the reliability of total bycatch estimates by combining a measure of BPUE robustness to exclusion of individual observations (based on RMSE), with the breadth of the confidence interval around the total bycatch estimate.
 
 The report detailing those functions is available at [INSERT REF TO DELIVERABLE]
+
+The original idea of BEAM was developed by Marjorie Lyssikatos and David Lusseau. The code was developed by David Lusseau, André Moan, Paula Gutiérrez Muñoz, Morgane Pommier, Henrik Pärn, Torbjörn Säterberg, Kim Magnus Bærum and Amaia Astarloa Diaz. WGBYC ToR C members contributed significantly to non-coding development and beta testing, particularly Marjorie Lyssikatos, Ailbhe Kavanagh, Caterina Fortuna, Guðjón Már Sigurðsson, Katja Ringdahl, Sara Königson, Ruth Fernandez, Allen Kingston, Lotte Kindt-Larsen and Carlos Pinto. The efforts to get BEAM to ICES Transparent Assessment Framework (TAF) are led by André Moan.
+The original BEAM code, used for ICES annual assessment by WGBYC and adapted here for CIBBRiNA, is available at: https://github.com/dlusseau/BEAM. 
+
+Further developments under CIBBRiNA WP6 were led by Morgane Pommier, Ailbhe Kavanagh and David Lusseau.
 
 # Advice on data preparation and quality control
 
