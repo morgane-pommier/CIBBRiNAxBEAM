@@ -2,13 +2,13 @@
 
 This repository compiles functions from the CIBBRiNAxBEAM bycatch estimation toolbox. The tools are implemented in the R programming language. The core functions of ICES WGBYC BEAM, used to estimate bycatch per unit of effort (BPUE) and total bycatch, are adapted to facilitate their application to a wider and more diverse set of bycatch data, such as those collected in CIBBRiNA case studies .
 
-- calc_bpue.r: Assesses whether heterogeneity in BPUE occurs within the fleet, selects the best modelling option in consequence, and estimates population-level BPUEs.
-- zero_assessment.r: For cases where no bycatch was reported, assesses whether a BPUE of 0 can be statistically supported, given the monitoring effort available.
-- calc_total.r: Uses the best model identified in calc_bpue.r to raise BPUE to total fishing effort and compute total bycatch, where possible.
-- calc_partia.r: In cases where total bycatch could not be estimated due to variability in BPUE across fleet segments but incomplete sampling across segments, calculates a partial bycatch estimate for the part of the fishery in which BPUE is known.
-- reliability_estimation.r: Assesses the reliability of total bycatch estimates by combining a measure of BPUE robustness to exclusion of individual observations (based on RMSE), with the breadth of the confidence interval around the total bycatch estimate.
+- **calc_bpue.r**: Assesses whether heterogeneity in BPUE occurs within the fleet, selects the best modelling option in consequence, and estimates population-level BPUEs.
+- **zero_assessment.r**: For cases where no bycatch was reported, assesses whether a BPUE of 0 can be statistically supported, given the monitoring effort available.
+- **calc_total.r**: Uses the best model identified in calc_bpue.r to raise BPUE to total fishing effort and compute total bycatch, where possible.
+- **calc_partia.r**: In cases where total bycatch could not be estimated due to variability in BPUE across fleet segments but incomplete sampling across segments, calculates a partial bycatch estimate for the part of the fishery in which BPUE is known.
+- **reliability_estimation.r**: Assesses the reliability of total bycatch estimates by combining a measure of BPUE robustness to exclusion of individual observations (based on RMSE), with the breadth of the confidence interval around the total bycatch estimate.
 
-The report detailing those functions is available at [INSERT REF TO DELIVERABLE]
+The report detailing those functions is available at **[INSERT REF TO DELIVERABLE]**
 
 The original idea of BEAM was developed by Marjorie Lyssikatos and David Lusseau. The code was developed by David Lusseau, André Moan, Paula Gutiérrez Muñoz, Morgane Pommier, Henrik Pärn, Torbjörn Säterberg, Kim Magnus Bærum and Amaia Astarloa Diaz. WGBYC ToR C members contributed significantly to non-coding development and beta testing, particularly Marjorie Lyssikatos, Ailbhe Kavanagh, Caterina Fortuna, Guðjón Már Sigurðsson, Katja Ringdahl, Sara Königson, Ruth Fernandez, Allen Kingston, Lotte Kindt-Larsen and Carlos Pinto. The efforts to get BEAM to ICES Transparent Assessment Framework (TAF) are led by André Moan.
 The original BEAM code, used for ICES annual assessment by WGBYC and adapted here for CIBBRiNA, is available at: https://github.com/dlusseau/BEAM. 
