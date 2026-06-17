@@ -33,7 +33,7 @@ calc_partial <- function(tot,
                          filter = NULL) {
   # parallelization support
   if (nrow(tot) > 1) {
-    ret <- foreach(
+    tot_partial <- foreach(
       i = 1:nrow(tot),
       .export = "calc_partial",
       # <- not 100% sure this line is needed.
@@ -53,7 +53,7 @@ calc_partial <- function(tot,
         filter = filter
       )
     }
-    return(ret)
+    return(tot_partial)
   }
   
   #Apply any filter to fishing if needed. Checks that the filtering columns are present in both fishing effort and monitoring data, so the observed bycatch can be filtered accordingly before summation at the end
@@ -93,10 +93,14 @@ calc_partial <- function(tot,
   }
   
   #Focus only on cases which were not calculated due to missing levels in monitoring
-  ret <- copy(tot)
+  tot_partial <- copy(tot)
+  colnames(tot_partial)[colnames(tot_partial) == "tot_mean"] <- "tot_mean_partial"
+  colnames(tot_partial)[colnames(tot_partial) == "tot_lwr"] <- "tot_upr_partial"
+  colnames(tot_partial)[colnames(tot_partial) == "tot_upr"] <- "tot_lwr_partial"
+  
   
   if (tot$message != "More levels available in fishing effort than in monitoring data for at least one random effect - Cannot estimate total bycatch for the levels in which BPUE is unknown") {
-    return(ret)
+    return(tot_partial)
   }
   
   #Create standardised column to use in data manipulation and modelling step further below. Avoids having to use get() of dat[[]] throughout the entire code.
@@ -138,8 +142,8 @@ calc_partial <- function(tot,
   }
   
   if (nrow(fishing_filtered) == 0) {
-    ret$message <- "No fishing effort remaining after restricting to monitored levels"
-    return(ret)
+    tot_partial$message <- "No fishing effort remaining after restricting to monitored levels"
+    return(tot_partial)
   }
   
   #Create the partial object
@@ -196,9 +200,9 @@ calc_partial <- function(tot,
     )
   }))
   
-  ret[, c("tot_mean", "tot_lwr", "tot_upr") := as.list(colSums(pred) + sum(tot_partial$observed_bycatch))] # prediction for unmonitored fishing effort + observed bycatch in monitoring
-  ret$fishing_effort <- sum(tot_partial$effort) # retain total fishing effort or total unmonitored fishing effort?
+  tot_partial[, c("tot_mean_partial", "tot_lwr_partial", "tot_upr_partial") := as.list(colSums(pred) + sum(tot_partial$observed_bycatch))] # prediction for unmonitored fishing effort + observed bycatch in monitoring
+  tot_partial$fishing_effort <- sum(tot_partial$effort) # retain total fishing effort or total unmonitored fishing effort?
   
-  return(ret)
+  return(tot_partial)
   
 }
