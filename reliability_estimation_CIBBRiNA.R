@@ -172,8 +172,9 @@ reliability_estimation <- function(tot,
     ret[, reliability_rmse        := lower_factor_prop <= 25 & upper_factor_prop <= 25]
     ret[, CI_breadth_pass := CI_breadth < 2]
     ret[, Overall_reliability := reliability_rmse & CI_breadth_pass]
-    
-    return(ret)
+
+    tot_reliability <- ret
+    return(tot_reliability)
 }
 
 
