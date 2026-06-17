@@ -19,7 +19,8 @@ Further developments under CIBBRiNA WP6 were led by Morgane Pommier, Ailbhe Kava
 
 To use these functions, users should prepare two datasets: one combining monitoring effort and bycatch records to estimate BPUE, and one describing total fishing effort to scale BPUE up to total bycatch. Both datasets should be aggregated at the same resolution. 
 
-<img width="982" height="423" alt="image" src="https://github.com/user-attachments/assets/fa89a0a2-d0e4-4453-8869-f32230a580f7" />
+<img width="5795" height="2575" alt="Data structure" src="https://github.com/user-attachments/assets/8ead43da-6743-4d9a-8e9e-c675ff2be3cf" />
+
 
 Aggregation levels (Figure 1) should capture the scale at which the assessment is to be produced (e.g. species x gear x region), while also accounting for finer grouping levels that may influence bycatch rate (e.g. year x subregion x vessel ID or vessel size x season x target fishery etc). Additional variables describing fishing operations, such as soak time or net length, may also be included, alongside the main unit of effort (e.g. number of days, trips, hooks etc) and corresponding observed bycatch. 
 Users may wish to apply quality standards and data filtering steps before implementing the BEAM process. For instance, in an ICES assessment, logbook data and port-observer data are excluded, as are records made while the protocol was focused on a different taxon than the one of the species of interest.
