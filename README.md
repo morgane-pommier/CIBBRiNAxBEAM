@@ -2,11 +2,15 @@
 
 This repository compiles functions from the CIBBRiNAxBEAM bycatch estimation toolbox. The core functions of ICES WGBYC BEAM (https://github.com/dlusseau/BEAM), used to estimate bycatch per unit of effort (BPUE) and total bycatch, were further developed to facilitate their application to a wider and more diverse set of bycatch data, such as those collected in CIBBRiNA case studies. 
 
-•	calc_bpue.r: Assesses whether heterogeneity in BPUE occurs within the fleet, selects the best modelling option in consequence, and estimates population-level BPUEs.
-•	zero_assessment.r: For cases where no bycatch was reported, assesses whether a BPUE of 0 can be statistically supported, given the monitoring effort available.
-•	calc_total.r: Uses the best model identified in calc_bpue.r to raise BPUE to total fishing effort and compute total bycatch, where possible.
-•	calc_partia.r: In cases where total bycatch could not be estimated due to variability in BPUE across fleet segments but incomplete sampling across segments, calculates a partial bycatch estimate for the part of the fishery in which BPUE is known.
-•	reliability_estimation.r: Assesses the reliability of total bycatch estimates by combining a measure of BPUE robustness to exclusion of individual observations (based on RMSE), with the breadth of the confidence interval around the total bycatch estimate.
+- calc_bpue.r: Assesses whether heterogeneity in BPUE occurs within the fleet, selects the best modelling option in consequence, and estimates population-level BPUEs.
+- zero_assessment.r: For cases where no bycatch was reported, assesses whether a BPUE of 0 can be statistically supported, given the monitoring effort available.
+- calc_total.r: Uses the best model identified in calc_bpue.r to raise BPUE to total fishing effort and compute total bycatch, where possible.
+- calc_partia.r: In cases where total bycatch could not be estimated due to variability in BPUE across fleet segments but incomplete sampling across segments, calculates a partial bycatch estimate for the part of the fishery in which BPUE is known.
+- reliability_estimation.r: Assesses the reliability of total bycatch estimates by combining a measure of BPUE robustness to exclusion of individual observations (based on RMSE), with the breadth of the confidence interval around the total bycatch estimate.
+
+The report detailing those functions is available at [INSERT REF TO DELIVERABLE]
+
+# Advice on data preparation and quality control
 
 To use these functions, users should prepare two datasets: one combining monitoring effort and bycatch records to estimate BPUE, and one describing total fishing effort to scale BPUE up to total bycatch. Both datasets should be aggregated at the same resolution. 
 
