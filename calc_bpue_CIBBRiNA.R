@@ -254,7 +254,9 @@ calc_bpue <- function(needle, analysis_resolution = colnames(needle), min_re_obs
     t_end <- Sys.time()
     t_elapsed <- difftime(t_end,t_start,units="mins")
     cat(sprintf("calc_bpue on %d rows completed in %.01f mins\n", nrow(needle), t_elapsed))
-    return(ret)
+
+	bpue <- ret				   
+    return(bpue)
     
 }
 
