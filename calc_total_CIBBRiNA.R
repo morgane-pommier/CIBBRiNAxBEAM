@@ -202,7 +202,8 @@ calc_total <- function(bpue, analysis_resolution, dat, fishing, verbose = TRUE, 
         ret$fishing_effort <- sum(tot$effort) # retain total fishing effort or total unmonitored fishing effort?
         
     }
-    
-    return(ret)
+
+    tot <- ret              
+    return(tot)
 }
 
