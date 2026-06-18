@@ -20,7 +20,7 @@
 #' @seealso [calc_bpue(), calc_partial()]
 #' @export
 
-calc_total <- function(bpue, analysis_resolution, dat, fishing, verbose = TRUE, include.weights=FALSE,response, effort_term,weights_values, filter=NULL) {
+calc_total <- function(bpue, analysis_resolution, dat, fishing, verbose = TRUE, include.weights=FALSE,response, effort_term,weights_values=NULL, filter=NULL) {
 
     # parallelization support
     if (nrow(bpue) > 1) {
@@ -28,7 +28,7 @@ calc_total <- function(bpue, analysis_resolution, dat, fishing, verbose = TRUE, 
                        .export = "calc_total", # <- not 100% sure this line is needed.
                        .final = rbindlist,
                        .packages = c("data.table", "glmmTMB", "emmeans", "ggeffects")) %dopar% {
-                           calc_total(bpue = bpue[i], analysis_resolution = analysis_resolution, dat = dat, fishing = fishing, verbose = FALSE, include.weights=FALSE,response, effort_term = effort_term,weights_values, filter)
+                           calc_total(bpue = bpue[i], analysis_resolution = analysis_resolution, dat = dat, fishing = fishing, verbose = FALSE, include.weights=include.weights,response=response, effort_term = effort_term,weights_values=weight_values, filter=filter)
                        }
         return(ret)
     }
@@ -59,7 +59,7 @@ calc_total <- function(bpue, analysis_resolution, dat, fishing, verbose = TRUE, 
   fishing_filtered <- fishing
   if (!is.null(filter) && length(filter_fishing) > 0) {
     for (col in names(filter_fishing)) {
-      fishing_filtered <- fishing_filtered[get(col) %in% filter_fishing[[col]]]
+      fishing_filtered <- fishing_filtered[fishing_filtered[[col]] %in% filter_fishing[[col]]]
     }
   }
 
@@ -84,8 +84,16 @@ calc_total <- function(bpue, analysis_resolution, dat, fishing, verbose = TRUE, 
     ret[, c("tot_mean", "tot_lwr", "tot_upr", "message", "fishing_effort") :=
             list(NA_real_, NA_real_, NA_real_, "OK", NA_real_)]
 
-        if (is.na(bpue$model) | (bpue$model == "none" & bpue$bpue !=0) | bpue$model == "only one") {
-        return(ret)
+    if (is.na(bpue$model) || (bpue$model == "none" && is.na(bpue$bpue)) || bpue$model == "only one") {
+    return(ret)
+        }
+    
+    #Force total estimate to be 0 if no model was available but BPUE = 0 was recovered
+    
+    if ((bpue$model == "none" & bpue$bpue ==0)) {
+      ret[, c("tot_mean", "tot_lwr", "tot_upr", "message", "fishing_effort") :=
+            list(0, 0, 0, "OK", sum(tot$effort))]
+      return(ret)
     }
 
     form <- as.formula(bpue$model)
@@ -119,13 +127,6 @@ calc_total <- function(bpue, analysis_resolution, dat, fishing, verbose = TRUE, 
         return(ret)
     }
     
-    #Force total estimate to be 0 if no model was available but BPUE = 0 was recovered
-    
-    if ((bpue$model == "none" & bpue$bpue ==0)) {
-      ret[, c("tot_mean", "tot_lwr", "tot_upr", "message", "fishing_effort") :=
-            list(0, 0, 0, "OK", sum(tot$effort))]
-      return(ret)
-    }
     
     # don't generate estimates unless the levels of all random effects match 
     # between monitored and total effort data (NOTE!! There are cases where monitoring effort strata do not exist in the total effort strata)
@@ -144,7 +145,7 @@ calc_total <- function(bpue, analysis_resolution, dat, fishing, verbose = TRUE, 
     dat_filtered <- dat
     if (!is.null(filter) && length(filter_dat) > 0) {
       for (col in names(filter_dat)) {
-        dat_filtered <- dat_filtered[get(col) %in% filter_dat[[col]]]
+        dat_filtered <- dat_filtered[dat_filtered[[col]] %in% filter_dat[[col]]]
       }
     }
     
@@ -202,8 +203,7 @@ calc_total <- function(bpue, analysis_resolution, dat, fishing, verbose = TRUE, 
         ret$fishing_effort <- sum(tot$effort) # retain total fishing effort or total unmonitored fishing effort?
         
     }
-
-    tot <- ret              
-    return(tot)
+    
+    return(ret)
 }
 
