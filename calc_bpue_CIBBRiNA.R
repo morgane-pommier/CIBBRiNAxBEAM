@@ -28,7 +28,6 @@
 #' @param dat data.table with monitored fishing effort data (e.g. since 2017)
 #' @param re_terms Optional. Character vector of column names to be considered as candidate random effects (e.g. c("year", "vessel", "area")). Should represent grouping factors that introduce variability or stratification in the data (e.g. sampling strata, fishing vessels, spatial or temporal clusters). Terms with fewer than min_re_obs unique levels will be automatically dropped. Set to NULL to fit without random effects. Defaults to NULL.
 #' @param fi_terms Optional. Character vector of column names specifying fixed effect terms. Typically represent additional covariates that may influence bycatch rates but do not define grouping structures in the data (e.g. soak time, net length). Set to NULL to fit models with no fixed effect other than the intercept. Default to NULL. Note: automated model selection is performed over random effects structure only. If comparing different fixed effect specifications, run the function separately for each combination.
-#' @param years vector with integers indicating years of assessment. 
 #' @param include.weights boolean indicator indicating whether observations from the five most recent years should have double weight as compared to older data. 
 #' @param weight_values Optional. Numeric vector of observation weights. Must be of the same length that dat. Only used if include.weights = TRUE. Default is NULL.
 #' @returns A data.table with one row for each row in `needle` and all columns given in `analysis_resolution`. Additional columns include, for each estimate: the observed number of individual or incidents (response) observed, the monitoring effort (unit = unit of analysis), the number of replicates (i.e. strata) available to fit the model, the output of the heterogeneity test (TRUE/FALSE) the best model formula and if any, the population level BPUE estimate from an intercept-only model, with associated lower and upper confidence intervals. (I^2). See details.
@@ -39,7 +38,7 @@ BEAM_progress <- function(n) {
     BEAM_pb$tick(tokens = list(step = n))
 }
 
-calc_bpue <- function(needle, analysis_resolution = colnames(needle), min_re_obs = 2, dat, response, years, effort_term, re_terms = NULL, fi_terms=NULL, include.weights = FALSE, weights_values = NULL) {
+calc_bpue <- function(needle, analysis_resolution = colnames(needle), min_re_obs = 2, dat, response, effort_term, re_terms = NULL, fi_terms=NULL, include.weights = FALSE, weights_values = NULL) {
 
     t_start <- Sys.time()
     
