@@ -80,18 +80,15 @@ calc_bpue <- function(needle, analysis_resolution = colnames(needle), min_re_obs
     #Create standardised column to use in data manipulation and modelling step further below. Avoids having to use get() of dat[[]] throughout the entire code.
     dat[, resp   := get(response)]
     dat[, effort := get(effort_term)]
-    if (isTRUE(include.weights)) dat[, weights := get(weights_values)] 
+
+	# add observation weights to data (if monitoring within the last five years use full weight, if older data weight observations half as strongly in the likelihood)
+	# dat[, weights := ifelse(year >= (max(years)-4),1,0.5)] This is an old example from WKBEAM, not used here.
+    if (isTRUE(include.weights)) {dat[, weights := get(weights_values)]}else{} #Use weights supplied by user
     
     dat <- dat[effort > 0]
     dat[, (analysis_resolution) := lapply(.SD, as.factor), .SDcols = analysis_resolution]
-    dat[, logEffort := log(effort)]
-	  dat[, resp := as.integer(resp)] 
-	  
-	  
-    # add observation weights to data(if monitoring within the last five years 
-    # use full weight, if older data weight observations half as strongly in the likelihood)
-    
-	  #dat[, weights := ifelse(year >= (max(years)-4),1,0.5)] OLD VERSION, KEEP AS AN EXAMPLE
+    dat[, logEffort := log(effort)] #Take log of effort
+	dat[, resp := as.integer(resp)] 
     
     ret <- needle[, ..analysis_resolution]
     ret[, c("observed_bycatch", "observed_effort", "model", "bpue", "lwr", "upr", "replicates", "base_model_heterogeneity", "alternative_models_flag") :=
@@ -103,7 +100,7 @@ calc_bpue <- function(needle, analysis_resolution = colnames(needle), min_re_obs
     
     # cop out when we only have 1 row of data
     if (nrow(dat) == 1) {
-        bpue <- dat$resp / dat$effort
+        bpue <- dat$resp / dat$effort #Basic ratio estimator
         lwr <- bpue -1.96 * sqrt(dat$resp / dat$effort^2)
         upr <- bpue +1.96 * sqrt(dat$resp / dat$effort^2)
         ret[, c("bpue", "lwr", "upr", "model") := list(bpue, lwr, upr, "only one")]
@@ -160,9 +157,11 @@ calc_bpue <- function(needle, analysis_resolution = colnames(needle), min_re_obs
         }
 
         re_candidates <- apply(re.i, 1, function(i) {
-          if (all(i == FALSE)) return(fixed_effects)  
+          if (all(i == FALSE)) {return(fixed_effects) 
+			} else {
           re_part <- sprintf("(1|%s)", re_terms[unlist(i)])
           return(paste(fixed_effects, "+", paste(re_part, collapse = " + ")))  
+			  }
         })						
 
 	## Integration of two versions of calc_bpue:
