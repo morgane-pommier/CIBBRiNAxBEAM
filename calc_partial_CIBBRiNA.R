@@ -106,23 +106,20 @@ calc_partial <- function(tot,
   #Create standardised column to use in data manipulation and modelling step further below. Avoids having to use get() of dat[[]] throughout the entire code.
   dat[, resp   := get(response)]
   dat[, effort := get(effort_term)]
-  if (isTRUE(include.weights))
-    dat[, weights := get(weights_values)]
+
+   # add observation weights to data(if monitoring within the last five years use full weight, if older data weight observations half as strongly in the likelihood)
+  #dat[, weights := ifelse(year >= (max(years)-4),1,0.5)] #Example used in WKBEAM
+  if (isTRUE(include.weights)) { dat[, weights := get(weights_values)] } else {}
   
   dat <- dat[tot, on = analysis_resolution]
   dat <- dat[effort > 0]
   
   dat[, (analysis_resolution) := lapply(.SD, as.factor), .SDcols = analysis_resolution]
-  dat[, logEffort := log(effort)]
+  dat[, logEffort := log(effort)] #Take log of effort
   dat[, resp := as.integer(resp)]
+   
   
-  # add observation weights to data(if monitoring within the last five years
-  # use full weight, if older data weight observations half as strongly in the likelihood)
-  #dat[, weights := ifelse(year >= (max(years)-4),1,0.5)] OLD VERSION, KEEP AS AN EXAMPLE
-  
- 
-  
-  form <- as.formula(tot$model)
+  form <- as.formula(tot$model) #That should automatically consider fixed effects if there were any in the first place
   re <- lme4::findbars(form) # random effects part of model formulation (if any)
   re <- sapply(re, function(x)
     as.character(x[[3]]))
