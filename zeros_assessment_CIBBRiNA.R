@@ -24,7 +24,7 @@ zero_assessments<-function(bpue,bycatch_rarity = 0.001, analysis_resolution ### 
                            ) {
 p <-0.01 #Threshold to accept / reject hypothesis. 0.01 chosen to be fairly certain that bycatch would have been detected and that therefore we can accept a bpue of 0.
 
-zero.candidates <-bpue[bpue$model=="none",] #Only focus on cases where no bycatch data is available
+zero.candidates <-bpue[model=="none"] #Only focus on cases where no bycatch data is available
 
 zero.candidates[, effort := round(observed_effort, 0)]
 zero.candidates <- zero.candidates[effort != 0]
