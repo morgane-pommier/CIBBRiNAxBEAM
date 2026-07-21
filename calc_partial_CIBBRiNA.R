@@ -91,13 +91,17 @@ calc_partial <- function(tot,
       fishing_filtered <- fishing_filtered[fishing_filtered[[col]] %in% filter_fishing[[col]]]
     }
   }
+
+   tot_partial <- copy(tot)
   
-  #Focus only on cases which were not calculated due to missing levels in monitoring
-  tot_partial <- copy(tot)
-  colnames(tot_partial)[colnames(tot_partial) == "tot_mean"] <- "tot_mean_partial"
-  colnames(tot_partial)[colnames(tot_partial) == "tot_lwr"] <- "tot_upr_partial"
-  colnames(tot_partial)[colnames(tot_partial) == "tot_upr"] <- "tot_lwr_partial"
+  #Add a qualifier column for partial vs total estimates
+  tot_partial$estimate_quality <- NA
+  tot_partial$estimate_quality <- ifelse(
+    tot_partial$message == "More levels available in fishing effort than in monitoring data for at least one random effect - Cannot estimate total bycatch for the levels in which BPUE is unknown",
+    "Partial estimate only",
+    "Total estimate")
   
+  #Focus only on cases which were not calculated due to missing levels in monitoring  
   
   if (tot$message != "More levels available in fishing effort than in monitoring data for at least one random effect - Cannot estimate total bycatch for the levels in which BPUE is unknown") {
     return(tot_partial)
@@ -197,7 +201,7 @@ calc_partial <- function(tot,
     )
   }))
   
-  tot_partial[, c("tot_mean_partial", "tot_lwr_partial", "tot_upr_partial") := as.list(colSums(pred) + sum(tot_partial$observed_bycatch))] # prediction for unmonitored fishing effort + observed bycatch in monitoring
+  tot_partial[, c("tot_mean", "tot_lwr", "tot_upr") := as.list(colSums(pred) + sum(tot_partial$observed_bycatch))] # prediction for unmonitored fishing effort + observed bycatch in monitoring
   tot_partial$fishing_effort <- sum(tot_partial$effort) # retain total fishing effort or total unmonitored fishing effort?
   
   return(tot_partial)
