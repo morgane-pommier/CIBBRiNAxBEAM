@@ -91,6 +91,9 @@ calc_total <- function(bpue, analysis_resolution, dat, fishing, verbose = TRUE, 
     #Force total estimate to be 0 if no model was available but BPUE = 0 was recovered
     
     if ((bpue$model == "none" & bpue$bpue ==0)) {
+      fishing_filtered[, effort := get(effort_term)]
+      tot <- fishing_filtered[bpue, on = analysis_resolution[analysis_resolution != "species"], .(effort = sum(effort))]
+      tot <- tot[complete.cases(tot)]
       ret[, c("tot_mean", "tot_lwr", "tot_upr", "message", "fishing_effort") :=
             list(0, 0, 0, "OK", sum(tot$effort))]
       return(ret)
@@ -124,6 +127,7 @@ calc_total <- function(bpue, analysis_resolution, dat, fishing, verbose = TRUE, 
     tot <- tot[complete.cases(tot)]
     
         if (nrow(tot) == 0) {
+        ret$message <- "No fishing effort left after filtering"
         return(ret)
     }
     
