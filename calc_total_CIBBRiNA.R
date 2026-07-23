@@ -162,6 +162,11 @@ calc_total <- function(bpue, analysis_resolution, dat, fishing, verbose = TRUE, 
         # join total fishing effort and monitored effort per random factor
         tot[,names(tot_obs) := tot_obs]
         tot <- tot[,unmonitored_fishing_effort := effort - observed_effort]
+
+         if (any(tot$unmonitored_fishing_effort < 0, na.rm = TRUE)) {
+          ret$message <- "monitoring effort exceeds total fishing effort in at least one substratum"
+          return(ret)}
+        
         tot[, logEffort := log(unmonitored_fishing_effort)] 
         
         pred <- as.data.frame(emmeans(best, ~1, offset = tot$logEffort, type = "response"))
@@ -184,6 +189,11 @@ calc_total <- function(bpue, analysis_resolution, dat, fishing, verbose = TRUE, 
         tot[is.na(observed_effort), observed_effort := 0] # replace na with 0
         tot[is.na(observed_bycatch), observed_bycatch := 0] # replace na with 0
         tot <- tot[,unmonitored_fishing_effort := effort - observed_effort] #
+
+         if (any(tot$unmonitored_fishing_effort < 0, na.rm = TRUE)) {
+          ret$message <- "monitoring effort exceeds total fishing effort in at least one substratum"
+          return(ret)}
+        
         tot[, logEffort := log(unmonitored_fishing_effort)]
       
 
