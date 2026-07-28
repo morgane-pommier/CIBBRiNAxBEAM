@@ -30,6 +30,7 @@ reliability_estimation <- function(tot,
                       dat,
                       analysis_resolution,
                       effort_term,
+                      response_term,
                       include.weights = FALSE,
                       weights_values  = NULL) {
   
@@ -59,6 +60,7 @@ reliability_estimation <- function(tot,
                        dat = dat,
                        analysis_resolution = analysis_resolution,
                        effort_term = effort_term,
+                       response_term = response_term,
                        include.weights = include.weights,
                        weights_values = weights_values
                      )
@@ -121,6 +123,7 @@ reliability_estimation <- function(tot,
     #Get column names for later steps, and compute logEffort
     
     data_subset[, effort := get(effort_term)]
+    data_subset[, resp := get(response_term)]
     if (isTRUE(include.weights)) data_subset[, weights := get(weights_values)]
     data_subset <- data_subset[effort > 0]
     data_subset[, (analysis_resolution) := lapply(.SD, as.factor), .SDcols = analysis_resolution]
