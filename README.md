@@ -1,14 +1,14 @@
-# BEAM-CIBBRiNA
+# CIBBRiNAxBEAM: A flexible bycatch assessment toolkit
 
 This repository compiles functions from the CIBBRiNAxBEAM bycatch estimation toolbox. The tools are implemented in the R programming language. The core functions of ICES WGBYC BEAM, used to estimate bycatch per unit of effort (BPUE) and total bycatch, are adapted to facilitate their application to a wider and more diverse set of bycatch data, such as those collected in CIBBRiNA case studies: 
 
-- **calc_bpue.r**: Assesses whether heterogeneity in BPUE (Bycatch per Unit of Effort) occurs within the fleet, selects the best modelling option, and estimates population-level BPUEs.
-- **zero_assessment.r**: For cases where no bycatch was reported, assesses whether a BPUE of 0 can be statistically supported, given the monitoring effort available.
-- **calc_total.r**: Uses the best model identified in calc_bpue.r to raise BPUE to total fishing effort and compute total bycatch, where possible.
-- **calc_partia.r**: In cases where total bycatch cannot be estimated due to variability within the fleet, but incomplete monitoring coverage, calculates a partial bycatch estimate for the part of the fishery in which BPUE is known.
-- **reliability_estimation.r**: Assesses the reliability of total bycatch estimates by combining a measure of BPUE robustness (i.e. how stable the estimate is when individual data points are iteratively from model fitting) , with the breadth of the confidence interval around the total bycatch estimate.
+- ``calc_bpue.r``: Assesses whether heterogeneity in BPUE (Bycatch per Unit of Effort) occurs within the fleet, selects the best modelling option, and estimates population-level BPUEs.
+- ``zero_assessment.r``: For cases where no bycatch was reported, assesses whether a BPUE of 0 can be statistically supported, given the monitoring effort available.
+- ``calc_total.r``: Uses the best model identified in calc_bpue.r to raise BPUE to total fishing effort and compute total bycatch, where possible.
+- ``calc_partia.r``: In cases where total bycatch cannot be estimated due to variability within the fleet, but incomplete monitoring coverage, calculates a partial bycatch estimate for the part of the fishery in which BPUE is known.
+- ``reliability_estimation.r``: Assesses the reliability of total bycatch estimates by combining a measure of BPUE robustness (i.e. how stable the estimate is when individual data points are iteratively from model fitting) , with the breadth of the confidence interval around the total bycatch estimate.
 
-For a tutorial on how to use the toolbox, please visit: https://morgane-pommier.github.io/CIBBRiNAxBEAM/. This implementation example uses a simulated dataset available in the /data folder, and all the code is provided in the Tutorial.Rmd file.
+For a tutorial on how to use the toolbox, please visit: https://morgane-pommier.github.io/CIBBRiNAxBEAM/. This implementation example uses a simulated dataset available in the ``/data`` folder, and all the code is provided in the ``Tutorial.Rmd`` file.
 
 The report detailing those functions is available at **[INSERT REF TO DELIVERABLE WHEN AVAILABLE]**
 
