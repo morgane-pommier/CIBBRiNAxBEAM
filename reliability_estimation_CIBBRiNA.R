@@ -82,10 +82,21 @@ reliability_estimation <- function(tot,
   
   #Skip cases that do not have a total bycatch estimate or no usable model. Partial estimates will by default have a unreliable estimate. Do we want to change that and still compute RMSE on partial models ?
   
-  if (is.na(tot$model) || tot$model %in% c("none", "only one") || is.na(tot$tot_mean)) {
+
+  if (is.na(tot$model) || (tot$model == "none" && is.na(tot$tot_mean)) || tot$model == "only one") {
     return(ret)
-  }
-  
+        }
+    
+    #Force total estimate of 0 to be considered reliable
+    
+    if ((tot$model == "none" & tot$tot_mean ==0)) {
+     c("RMSE", "factor", "lower_factor_prop", "upper_factor_prop",
+          "reliability_rmse", "CI_breadth_pass", "Overall_reliability",
+          "tot_lwr_log", "tot_upr_log", "CI_breadth") :=
+        list(NA_real_, NA_real_, NA_real_, NA_real_, NA, NA, TRUE,
+             NA_real_, NA_real_, NA_real_)
+      return(ret)
+    }
   
     # helper function (to avoid repeated code). Same as original BEAM, just added weights option
   fit_and_predict <- function(form, data, levels = NULL) {
