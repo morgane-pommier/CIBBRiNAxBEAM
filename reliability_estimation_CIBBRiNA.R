@@ -90,11 +90,11 @@ reliability_estimation <- function(tot,
     #Force total estimate of 0 to be considered reliable
     
     if ((tot$model == "none" & tot$tot_mean ==0)) {
-     c("RMSE", "factor", "lower_factor_prop", "upper_factor_prop",
+    ret[, c("RMSE", "factor", "lower_factor_prop", "upper_factor_prop",
           "reliability_rmse", "CI_breadth_pass", "Overall_reliability",
           "tot_lwr_log", "tot_upr_log", "CI_breadth") :=
         list(NA_real_, NA_real_, NA_real_, NA_real_, NA, NA, TRUE,
-             NA_real_, NA_real_, NA_real_)
+             NA_real_, NA_real_, NA_real_)]
       return(ret)
     }
   
